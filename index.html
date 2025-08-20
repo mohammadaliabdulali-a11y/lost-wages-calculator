@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lost Wages Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+    .results {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .results p {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #0077cc;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lost Wages Calculator</h1>
+  
+  <label for="amount">Enter earnings:</label>
+  <input type="number" id="amount" placeholder="e.g., 300" />
+
+  <label for="period">Select period:</label>
+  <select id="period">
+    <option value="day">Per Day</option>
+    <option value="week">Per Week</option>
+    <option value="month">Per Month</option>
+    <option value="year">Per Year</option>
+  </select>
+
+  <button onclick="calculate()">Calculate</button>
+  <button onclick="shareLink()">Copy Shareable Link</button>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    function calculate() {
+      let amount = parseFloat(document.getElementById('amount').value);
+      let period = document.getElementById('period').value;
+      if (isNaN(amount) || amount <= 0) {
+        document.getElementById('results').innerHTML = "<p>Please enter a valid number.</p>";
+        return;
+      }
+
+      let perDay, perWeek, perMonth, perYear;
+      if (period === "day") {
+        perDay = amount;
+        perWeek = amount * 7;
+        perMonth = amount * 30.42; 
+        perYear = amount * 365;
+      } else if (period === "week") {
+        perDay = amount / 7;
+        perWeek = amount;
+        perMonth = (amount * 52) / 12;
+        perYear = amount * 52;
+      } else if (period === "month") {
+        perDay = amount / 30.42;
+        perWeek = (amount * 12) / 52;
+        perMonth = amount;
+        perYear = amount * 12;
+      } else if (period === "year") {
+        perDay = amount / 365;
+        perWeek = amount / 52;
+        perMonth = amount / 12;
+        perYear = amount;
+      }
+
+      document.getElementById('results').innerHTML = `
+        <p><strong>Per Day:</strong> $${perDay.toFixed(2)}</p>
+        <p><strong>Per Week:</strong> $${perWeek.toFixed(2)}</p>
+        <p><strong>Per Month:</strong> $${perMonth.toFixed(2)}</p>
+        <p><strong>Per Year:</strong> $${perYear.toFixed(2)}</p>
+      `;
+    }
+
+    function shareLink() {
+      let amount = document.getElementById('amount').value;
+      let period = document.getElementById('period').value;
+      if (!amount) {
+        alert("Please enter a value first.");
+        return;
+      }
+      let url = window.location.origin + window.location.pathname + "?amount=" + amount + "&period=" + period;
+      navigator.clipboard.writeText(url).then(() => {
+        alert("Shareable link copied!");
+      });
+    }
+
+    // Load from URL if params exist
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("amount") && params.has("period")) {
+        document.getElementById("amount").value = params.get("amount");
+        document.getElementById("period").value = params.get("period");
+        calculate();
+      }
+    }
+  </script>
+</body>
+</html>
